@@ -1,0 +1,62 @@
+[
+  {
+    "id": "cat-001",
+    "name": "你好",
+    "code": "HELLO",
+    "color": "#ef4444"
+  },
+  {
+    "id": "cat-002",
+    "name": "谢谢",
+    "code": "THANKS",
+    "color": "#f59e0b"
+  },
+  {
+    "id": "cat-003",
+    "name": "对不起",
+    "code": "SORRY",
+    "color": "#10b981"
+  },
+  {
+    "id": "cat-004",
+    "name": "再见",
+    "code": "GOODBYE",
+    "color": "#3b82f6"
+  },
+  {
+    "id": "cat-005",
+    "name": "是",
+    "code": "YES",
+    "color": "#8b5cf6"
+  },
+  {
+    "id": "cat-006",
+    "name": "不是",
+    "code": "NO",
+    "color": "#ec4899"
+  },
+  {
+    "id": "cat-007",
+    "name": "请",
+    "code": "PLEASE",
+    "color": "#06b6d4"
+  },
+  {
+    "id": "cat-008",
+    "name": "帮助",
+    "code": "HELP",
+    "color": "#84cc16"
+  },
+  {
+    "id": "cat-009",
+    "name": "我",
+    "code": "ME",
+    "color": "#f97316"
+  },
+  {
+    "id": "cat-010",
+    "name": "你",
+    "code": "YOU",
+    "color": "#6366f1"
+  }
+]

@@ -1,0 +1,404 @@
+[
+  {
+    "id": "sample-001",
+    "name": "日常对话片段_001",
+    "videoUrl": "",
+    "totalFrames": 300,
+    "fps": 30,
+    "status": "pending",
+    "priority": "high",
+    "createdAt": "2026-06-18T09:00:00.000Z",
+    "updatedAt": "2026-06-18T09:00:00.000Z",
+    "rejectCount": 0,
+    "rejections": [],
+    "intervals": [
+      {
+        "id": "int-001-001",
+        "sampleId": "sample-001",
+        "startFrame": 10,
+        "endFrame": 45,
+        "categoryId": "cat-001",
+        "confidence": 0.92,
+        "isModified": false,
+        "createdAt": "2026-06-18T09:00:00.000Z",
+        "updatedAt": "2026-06-18T09:00:00.000Z"
+      },
+      {
+        "id": "int-001-002",
+        "sampleId": "sample-001",
+        "startFrame": 60,
+        "endFrame": 95,
+        "categoryId": "cat-002",
+        "confidence": 0.87,
+        "isModified": false,
+        "createdAt": "2026-06-18T09:00:00.000Z",
+        "updatedAt": "2026-06-18T09:00:00.000Z"
+      },
+      {
+        "id": "int-001-003",
+        "sampleId": "sample-001",
+        "startFrame": 120,
+        "endFrame": 160,
+        "categoryId": "cat-004",
+        "confidence": 0.78,
+        "isModified": false,
+        "createdAt": "2026-06-18T09:00:00.000Z",
+        "updatedAt": "2026-06-18T09:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-002",
+    "name": "日常对话片段_002",
+    "videoUrl": "",
+    "totalFrames": 450,
+    "fps": 30,
+    "status": "pending",
+    "priority": "normal",
+    "createdAt": "2026-06-18T10:30:00.000Z",
+    "updatedAt": "2026-06-18T10:30:00.000Z",
+    "rejectCount": 0,
+    "rejections": [],
+    "intervals": [
+      {
+        "id": "int-002-001",
+        "sampleId": "sample-002",
+        "startFrame": 5,
+        "endFrame": 40,
+        "categoryId": "cat-005",
+        "confidence": 0.95,
+        "isModified": false,
+        "createdAt": "2026-06-18T10:30:00.000Z",
+        "updatedAt": "2026-06-18T10:30:00.000Z"
+      },
+      {
+        "id": "int-002-002",
+        "sampleId": "sample-002",
+        "startFrame": 55,
+        "endFrame": 90,
+        "categoryId": "cat-006",
+        "confidence": 0.91,
+        "isModified": false,
+        "createdAt": "2026-06-18T10:30:00.000Z",
+        "updatedAt": "2026-06-18T10:30:00.000Z"
+      },
+      {
+        "id": "int-002-003",
+        "sampleId": "sample-002",
+        "startFrame": 110,
+        "endFrame": 145,
+        "categoryId": "cat-009",
+        "confidence": 0.83,
+        "isModified": false,
+        "createdAt": "2026-06-18T10:30:00.000Z",
+        "updatedAt": "2026-06-18T10:30:00.000Z"
+      },
+      {
+        "id": "int-002-004",
+        "sampleId": "sample-002",
+        "startFrame": 200,
+        "endFrame": 240,
+        "categoryId": "cat-010",
+        "confidence": 0.79,
+        "isModified": false,
+        "createdAt": "2026-06-18T10:30:00.000Z",
+        "updatedAt": "2026-06-18T10:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-003",
+    "name": "日常对话片段_003",
+    "videoUrl": "",
+    "totalFrames": 360,
+    "fps": 30,
+    "status": "pending",
+    "priority": "low",
+    "createdAt": "2026-06-19T14:00:00.000Z",
+    "updatedAt": "2026-06-19T14:00:00.000Z",
+    "rejectCount": 0,
+    "rejections": [],
+    "intervals": [
+      {
+        "id": "int-003-001",
+        "sampleId": "sample-003",
+        "startFrame": 15,
+        "endFrame": 50,
+        "categoryId": "cat-007",
+        "confidence": 0.88,
+        "isModified": false,
+        "createdAt": "2026-06-19T14:00:00.000Z",
+        "updatedAt": "2026-06-19T14:00:00.000Z"
+      },
+      {
+        "id": "int-003-002",
+        "sampleId": "sample-003",
+        "startFrame": 70,
+        "endFrame": 105,
+        "categoryId": "cat-008",
+        "confidence": 0.85,
+        "isModified": false,
+        "createdAt": "2026-06-19T14:00:00.000Z",
+        "updatedAt": "2026-06-19T14:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-004",
+    "name": "日常对话片段_004",
+    "videoUrl": "",
+    "totalFrames": 420,
+    "fps": 30,
+    "status": "rejected",
+    "priority": "high",
+    "createdAt": "2026-06-17T08:00:00.000Z",
+    "updatedAt": "2026-06-18T16:30:00.000Z",
+    "rejectCount": 1,
+    "rejections": [
+      {
+        "id": "rej-004-001",
+        "sampleId": "sample-004",
+        "userId": "user-001",
+        "userName": "张审核",
+        "reason": "标注区间不准确 起始帧位置错误 类别判断有误 需要重新检查",
+        "createdAt": "2026-06-18T16:30:00.000Z"
+      }
+    ],
+    "intervals": [
+      {
+        "id": "int-004-001",
+        "sampleId": "sample-004",
+        "startFrame": 20,
+        "endFrame": 55,
+        "categoryId": "cat-001",
+        "confidence": 0.76,
+        "isModified": false,
+        "createdAt": "2026-06-17T08:00:00.000Z",
+        "updatedAt": "2026-06-17T08:00:00.000Z"
+      },
+      {
+        "id": "int-004-002",
+        "sampleId": "sample-004",
+        "startFrame": 80,
+        "endFrame": 120,
+        "categoryId": "cat-003",
+        "confidence": 0.82,
+        "isModified": false,
+        "createdAt": "2026-06-17T08:00:00.000Z",
+        "updatedAt": "2026-06-17T08:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-005",
+    "name": "日常对话片段_005",
+    "videoUrl": "",
+    "totalFrames": 380,
+    "fps": 30,
+    "status": "disputed",
+    "priority": "high",
+    "createdAt": "2026-06-16T09:00:00.000Z",
+    "updatedAt": "2026-06-19T11:00:00.000Z",
+    "rejectCount": 2,
+    "rejections": [
+      {
+        "id": "rej-005-001",
+        "sampleId": "sample-005",
+        "userId": "user-001",
+        "userName": "张审核",
+        "reason": "标注区间不准确 起始帧错误 类别判断有误",
+        "createdAt": "2026-06-18T10:00:00.000Z"
+      },
+      {
+        "id": "rej-005-002",
+        "sampleId": "sample-005",
+        "userId": "user-002",
+        "userName": "李审核",
+        "reason": "区间不准确 起始帧位置错误 类别判断有误 需要检查",
+        "createdAt": "2026-06-19T11:00:00.000Z"
+      }
+    ],
+    "dispute": {
+      "id": "dispute-001",
+      "sampleId": "sample-005",
+      "similarity": 0.67
+    },
+    "intervals": [
+      {
+        "id": "int-005-001",
+        "sampleId": "sample-005",
+        "startFrame": 25,
+        "endFrame": 60,
+        "categoryId": "cat-002",
+        "confidence": 0.71,
+        "isModified": false,
+        "createdAt": "2026-06-16T09:00:00.000Z",
+        "updatedAt": "2026-06-16T09:00:00.000Z"
+      },
+      {
+        "id": "int-005-002",
+        "sampleId": "sample-005",
+        "startFrame": 90,
+        "endFrame": 130,
+        "categoryId": "cat-005",
+        "confidence": 0.68,
+        "isModified": false,
+        "createdAt": "2026-06-16T09:00:00.000Z",
+        "updatedAt": "2026-06-16T09:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-006",
+    "name": "日常对话片段_006",
+    "videoUrl": "",
+    "totalFrames": 290,
+    "fps": 30,
+    "status": "approved",
+    "priority": "normal",
+    "createdAt": "2026-06-15T10:00:00.000Z",
+    "updatedAt": "2026-06-18T14:20:00.000Z",
+    "reviewedAt": "2026-06-18T14:20:00.000Z",
+    "reviewedBy": "张审核",
+    "rejectCount": 0,
+    "rejections": [],
+    "intervals": [
+      {
+        "id": "int-006-001",
+        "sampleId": "sample-006",
+        "startFrame": 8,
+        "endFrame": 42,
+        "categoryId": "cat-004",
+        "confidence": 0.94,
+        "isModified": false,
+        "createdAt": "2026-06-15T10:00:00.000Z",
+        "updatedAt": "2026-06-18T14:20:00.000Z"
+      },
+      {
+        "id": "int-006-002",
+        "sampleId": "sample-006",
+        "startFrame": 58,
+        "endFrame": 92,
+        "categoryId": "cat-007",
+        "confidence": 0.89,
+        "isModified": true,
+        "createdAt": "2026-06-15T10:00:00.000Z",
+        "updatedAt": "2026-06-18T14:15:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-007",
+    "name": "日常对话片段_007",
+    "videoUrl": "",
+    "totalFrames": 340,
+    "fps": 30,
+    "status": "locked",
+    "priority": "high",
+    "createdAt": "2026-06-14T09:00:00.000Z",
+    "updatedAt": "2026-06-19T16:00:00.000Z",
+    "reviewedAt": "2026-06-19T16:00:00.000Z",
+    "reviewedBy": "王主管",
+    "rejectCount": 2,
+    "rejections": [
+      {
+        "id": "rej-007-001",
+        "sampleId": "sample-007",
+        "userId": "user-001",
+        "userName": "张审核",
+        "reason": "区间错误 类别不准确 标注质量差",
+        "createdAt": "2026-06-17T11:00:00.000Z"
+      },
+      {
+        "id": "rej-007-002",
+        "sampleId": "sample-007",
+        "userId": "user-002",
+        "userName": "李审核",
+        "reason": "区间错误 类别不准确 需要重新标注",
+        "createdAt": "2026-06-18T09:00:00.000Z"
+      }
+    ],
+    "dispute": {
+      "id": "dispute-002",
+      "sampleId": "sample-007",
+      "similarity": 0.72,
+      "finalDecision": "approved",
+      "decidedBy": "王主管",
+      "decidedAt": "2026-06-19T16:00:00.000Z"
+    },
+    "intervals": [
+      {
+        "id": "int-007-001",
+        "sampleId": "sample-007",
+        "startFrame": 12,
+        "endFrame": 48,
+        "categoryId": "cat-003",
+        "confidence": 0.82,
+        "isModified": true,
+        "createdAt": "2026-06-14T09:00:00.000Z",
+        "updatedAt": "2026-06-19T15:50:00.000Z"
+      },
+      {
+        "id": "int-007-002",
+        "sampleId": "sample-007",
+        "startFrame": 75,
+        "endFrame": 110,
+        "categoryId": "cat-006",
+        "confidence": 0.75,
+        "isModified": true,
+        "createdAt": "2026-06-14T09:00:00.000Z",
+        "updatedAt": "2026-06-19T15:55:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "sample-008",
+    "name": "日常对话片段_008",
+    "videoUrl": "",
+    "totalFrames": 400,
+    "fps": 30,
+    "status": "approved",
+    "priority": "normal",
+    "createdAt": "2026-06-19T09:00:00.000Z",
+    "updatedAt": "2026-06-19T15:30:00.000Z",
+    "reviewedAt": "2026-06-19T15:30:00.000Z",
+    "reviewedBy": "李审核",
+    "rejectCount": 0,
+    "rejections": [],
+    "intervals": [
+      {
+        "id": "int-008-001",
+        "sampleId": "sample-008",
+        "startFrame": 10,
+        "endFrame": 45,
+        "categoryId": "cat-009",
+        "confidence": 0.96,
+        "isModified": false,
+        "createdAt": "2026-06-19T09:00:00.000Z",
+        "updatedAt": "2026-06-19T09:00:00.000Z"
+      },
+      {
+        "id": "int-008-002",
+        "sampleId": "sample-008",
+        "startFrame": 65,
+        "endFrame": 100,
+        "categoryId": "cat-010",
+        "confidence": 0.91,
+        "isModified": false,
+        "createdAt": "2026-06-19T09:00:00.000Z",
+        "updatedAt": "2026-06-19T09:00:00.000Z"
+      },
+      {
+        "id": "int-008-003",
+        "sampleId": "sample-008",
+        "startFrame": 130,
+        "endFrame": 170,
+        "categoryId": "cat-001",
+        "confidence": 0.88,
+        "isModified": false,
+        "createdAt": "2026-06-19T09:00:00.000Z",
+        "updatedAt": "2026-06-19T09:00:00.000Z"
+      }
+    ]
+  }
+]

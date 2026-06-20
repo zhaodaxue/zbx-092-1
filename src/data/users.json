@@ -1,0 +1,17 @@
+[
+  {
+    "id": "user-001",
+    "name": "张审核",
+    "role": "reviewer"
+  },
+  {
+    "id": "user-002",
+    "name": "李审核",
+    "role": "reviewer"
+  },
+  {
+    "id": "user-003",
+    "name": "王主管",
+    "role": "supervisor"
+  }
+]
