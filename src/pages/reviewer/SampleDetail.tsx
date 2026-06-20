@@ -93,6 +93,11 @@ const SampleDetail: React.FC = () => {
       setShowRejectModal(false);
       setIsSubmitting(false);
       
+      if (result.alreadyRejected) {
+        setNotification({ type: 'error', message: '您已驳回过该样本，请换其他审核员处理' });
+        return;
+      }
+      
       if (result.isDisputed) {
         setNotification({ 
           type: 'success', 
@@ -108,6 +113,12 @@ const SampleDetail: React.FC = () => {
 
   const isLocked = sample.status === 'locked';
   const canEdit = !isLocked && (sample.status === 'pending' || sample.status === 'rejected');
+  const currentUserHasRejected = currentUser
+    ? sample.rejections.some(r => r.userId === currentUser.id)
+    : false;
+  const otherRejections = currentUser
+    ? sample.rejections.filter(r => r.userId !== currentUser.id)
+    : sample.rejections;
 
   return (
     <AppLayout>
@@ -225,25 +236,28 @@ const SampleDetail: React.FC = () => {
           />
         </div>
 
-        <div className="card p-6">
+        <div>
           <h2 className="text-lg font-semibold text-white mb-4">驳回历史</h2>
           <RejectionHistory
             rejections={sample.rejections}
             similarity={sample.dispute?.similarity}
+            currentUserId={currentUser?.id}
           />
         </div>
       </div>
 
       {canEdit && (
         <div className="mt-6 flex items-center justify-end gap-4">
-          <button
-            onClick={() => setShowRejectModal(true)}
-            disabled={isSubmitting}
-            className="btn btn-danger flex items-center gap-2"
-          >
-            <X size={18} />
-            驳回
-          </button>
+          {!currentUserHasRejected && (
+            <button
+              onClick={() => setShowRejectModal(true)}
+              disabled={isSubmitting}
+              className="btn btn-danger flex items-center gap-2"
+            >
+              <X size={18} />
+              驳回
+            </button>
+          )}
           <button
             onClick={handleApprove}
             disabled={isSubmitting}
@@ -261,6 +275,7 @@ const SampleDetail: React.FC = () => {
           onClose={() => setShowRejectModal(false)}
           onConfirm={handleReject}
           loading={isSubmitting}
+          otherRejections={otherRejections}
         />
       )}
 

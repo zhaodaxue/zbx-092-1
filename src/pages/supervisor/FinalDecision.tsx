@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, X, Lock, AlertTriangle, Info, Plus } from 'lucide-react';
+import { ArrowLeft, Check, X, Lock, AlertTriangle, Info, Plus, Zap, AlertCircle } from 'lucide-react';
 import { AppLayout } from '../../components/Layout/AppLayout';
 import { Timeline } from '../../components/Timeline/Timeline';
 import { IntervalList } from '../../components/IntervalList/IntervalList';
@@ -11,7 +11,7 @@ import { useSampleStore } from '../../store/useSampleStore';
 import { useCategoryStore } from '../../store/useCategoryStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { formatDate, framesToTime } from '../../utils/time';
-import type { AnnotationInterval } from '../../types';
+import type { AnnotationInterval, Rejection } from '../../types';
 
 const FinalDecision: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -100,6 +100,15 @@ const FinalDecision: React.FC = () => {
   const isLocked = sample.status === 'locked';
   const canEdit = !isLocked && sample.status === 'disputed';
 
+  const disputeTriggeredRejections = useMemo((): [Rejection, Rejection] | null => {
+    if (!sample.dispute?.rejectionIds) return null;
+    const [id1, id2] = sample.dispute.rejectionIds;
+    const r1 = sample.rejections.find(r => r.id === id1);
+    const r2 = sample.rejections.find(r => r.id === id2);
+    if (!r1 || !r2) return null;
+    return [r1, r2];
+  }, [sample.dispute, sample.rejections]);
+
   return (
     <AppLayout>
       {notification && (
@@ -135,21 +144,48 @@ const FinalDecision: React.FC = () => {
         <div className="bg-warning-900/30 border border-warning-600/50 rounded-lg p-4 mb-6">
           <div className="flex items-start gap-3">
             <AlertTriangle className="text-warning-400 flex-shrink-0 mt-0.5" size={20} />
-            <div>
-              <div className="font-medium text-warning-300 mb-2">争议信息</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 flex-wrap mb-3">
+                <div className="font-medium text-warning-300">争议信息</div>
+                {sample.dispute.triggeredBySecondRejection !== undefined && (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                    sample.dispute.triggeredBySecondRejection 
+                      ? 'bg-danger-900/40 text-danger-300 border border-danger-600/40' 
+                      : 'bg-warning-900/40 text-warning-300 border border-warning-600/40'
+                  }`}>
+                    {sample.dispute.triggeredBySecondRejection ? (
+                      <><Zap size={12} /> 由第二次驳回触发升级</>
+                    ) : (
+                      <><AlertCircle size={12} /> 由复核驳回触发升级</>
+                    )}
+                  </span>
+                )}
+              </div>
+              
               <div className="text-sm text-warning-200 mb-3">
-                两名审核员驳回原因相似度：<span className="font-bold">{(sample.dispute.similarity * 100).toFixed(0)}%</span>
+                两名审核员驳回原因相似度：<span className="font-bold text-danger-300">{(sample.dispute.similarity * 100).toFixed(0)}%</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {sample.rejections.slice(0, 2).map((rejection) => (
-                  <div key={rejection.id} className="bg-warning-900/30 rounded-lg p-3">
-                    <div className="text-xs text-warning-400 mb-1">
-                      {rejection.userName} - {formatDate(rejection.createdAt)}
-                    </div>
-                    <div className="text-sm text-warning-200">{rejection.reason}</div>
+
+              {disputeTriggeredRejections && (
+                <div className="mb-2">
+                  <div className="text-xs text-warning-400 mb-2 font-medium">触发争议的两条驳回原文：</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {disputeTriggeredRejections.map((rejection) => (
+                      <div key={rejection.id} className="bg-warning-900/40 rounded-lg p-3 border border-warning-800/50">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-warning-400 font-medium">
+                            {rejection.userName}
+                          </span>
+                          <span className="text-xs text-warning-500">
+                            {formatDate(rejection.createdAt)}
+                          </span>
+                        </div>
+                        <div className="text-sm text-warning-200">"{rejection.reason}"</div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -238,6 +274,8 @@ const FinalDecision: React.FC = () => {
           <RejectionHistory
             rejections={sample.rejections}
             similarity={sample.dispute?.similarity}
+            disputeTriggered={!!sample.dispute}
+            disputeTriggeredBySecondRejection={sample.dispute?.triggeredBySecondRejection}
           />
         </div>
       </div>

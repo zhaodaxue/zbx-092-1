@@ -59,10 +59,14 @@ export interface Dispute {
   id: string;
   sampleId: string;
   similarity: number;
+  rejectionIds: [string, string];
+  triggeredBySecondRejection: boolean;
   finalDecision?: 'approved' | 'rejected';
   decidedBy?: string;
   decidedAt?: string;
 }
+
+export type QueueRiskFlag = 'none' | 'awaiting-second-rejection' | 'waiting-others';
 
 export type DragMode = 'move' | 'resize-left' | 'resize-right' | null;
 

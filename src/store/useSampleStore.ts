@@ -17,8 +17,13 @@ interface SampleState {
   addInterval: (sampleId: string, startFrame: number, endFrame: number, categoryId: string) => boolean;
   deleteInterval: (sampleId: string, intervalId: string) => void;
   approveSample: (sampleId: string, userName: string) => void;
-  rejectSample: (sampleId: string, userId: string, userName: string, reason: string) => { isDisputed: boolean; similarity: number };
+  rejectSample: (sampleId: string, userId: string, userName: string, reason: string) => { 
+    isDisputed: boolean; 
+    similarity: number;
+    alreadyRejected: boolean;
+  };
   finalDecision: (sampleId: string, decision: 'approved' | 'rejected', userName: string) => void;
+  getQueueRiskFlag: (sample: Sample, currentUserId: string) => 'none' | 'awaiting-second-rejection' | 'waiting-others';
 }
 
 const STORAGE_KEY = 'samples';
@@ -166,9 +171,14 @@ export const useSampleStore = create<SampleState>((set, get) => {
     rejectSample: (sampleId: string, userId: string, userName: string, reason: string) => {
       const samples = [...get().samples];
       const sampleIndex = samples.findIndex(s => s.id === sampleId);
-      if (sampleIndex === -1) return { isDisputed: false, similarity: 0 };
+      if (sampleIndex === -1) return { isDisputed: false, similarity: 0, alreadyRejected: false };
 
       const sample = { ...samples[sampleIndex] };
+      
+      const existingRejection = sample.rejections.find(r => r.userId === userId);
+      if (existingRejection) {
+        return { isDisputed: false, similarity: 0, alreadyRejected: true };
+      }
       
       const rejection: Rejection = {
         id: `rej-${generateId()}`,
@@ -183,14 +193,16 @@ export const useSampleStore = create<SampleState>((set, get) => {
       sample.rejectCount = sample.rejections.length;
       sample.updatedAt = new Date().toISOString();
 
-      const { shouldDispute, similarity } = checkDisputeThreshold(sample.rejections);
+      const { shouldDispute, similarity, rejectionIds, isSecondRejection } = checkDisputeThreshold(sample.rejections);
       
-      if (shouldDispute) {
+      if (shouldDispute && rejectionIds) {
         sample.status = 'disputed';
         const dispute: Dispute = {
           id: `dispute-${generateId()}`,
           sampleId,
           similarity,
+          rejectionIds,
+          triggeredBySecondRejection: !!isSecondRejection,
         };
         sample.dispute = dispute;
       } else {
@@ -201,7 +213,27 @@ export const useSampleStore = create<SampleState>((set, get) => {
       set({ samples, currentSample: sample });
       persistSamples(samples);
 
-      return { isDisputed: shouldDispute, similarity };
+      return { isDisputed: shouldDispute, similarity, alreadyRejected: false };
+    },
+
+    getQueueRiskFlag: (sample: Sample, currentUserId: string) => {
+      if (sample.status === 'disputed' || sample.status === 'approved' || sample.status === 'locked') {
+        return 'none';
+      }
+      if (sample.rejections.length === 0) {
+        return 'none';
+      }
+      
+      const currentUserRejected = sample.rejections.some(r => r.userId === currentUserId);
+      const hasOtherRejection = sample.rejections.some(r => r.userId !== currentUserId);
+      
+      if (currentUserRejected) {
+        return 'waiting-others';
+      }
+      if (hasOtherRejection) {
+        return 'awaiting-second-rejection';
+      }
+      return 'none';
     },
 
     finalDecision: (sampleId: string, decision: 'approved' | 'rejected', userName: string) => {

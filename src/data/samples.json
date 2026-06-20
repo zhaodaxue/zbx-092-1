@@ -221,7 +221,9 @@
     "dispute": {
       "id": "dispute-001",
       "sampleId": "sample-005",
-      "similarity": 0.60
+      "similarity": 0.60,
+      "rejectionIds": ["rej-005-001", "rej-005-002"],
+      "triggeredBySecondRejection": true
     },
     "intervals": [
       {
@@ -322,6 +324,8 @@
       "id": "dispute-002",
       "sampleId": "sample-007",
       "similarity": 0.58,
+      "rejectionIds": ["rej-007-001", "rej-007-002"],
+      "triggeredBySecondRejection": true,
       "finalDecision": "approved",
       "decidedBy": "王主管",
       "decidedAt": "2026-06-19T16:00:00.000Z"

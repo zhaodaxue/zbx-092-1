@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Clock, User, ChevronRight } from 'lucide-react';
+import { AlertTriangle, Clock, User, ChevronRight, Zap, AlertCircle } from 'lucide-react';
 import { AppLayout } from '../../components/Layout/AppLayout';
 import { StatusBadge, PriorityBadge } from '../../components/ui/StatusBadge';
 import { useSampleStore } from '../../store/useSampleStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { formatDate, framesToTime } from '../../utils/time';
+import type { Rejection } from '../../types';
 
 const Disputes: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +14,15 @@ const Disputes: React.FC = () => {
   const { currentUser } = useAuthStore();
   
   const disputeQueue = getDisputeQueue();
+
+  const getTriggeredRejections = (sample: typeof disputeQueue[0]): [Rejection, Rejection] | null => {
+    if (!sample.dispute?.rejectionIds) return null;
+    const [id1, id2] = sample.dispute.rejectionIds;
+    const r1 = sample.rejections.find(r => r.id === id1);
+    const r2 = sample.rejections.find(r => r.id === id2);
+    if (!r1 || !r2) return null;
+    return [r1, r2];
+  };
 
   if (!currentUser) {
     navigate('/login');
@@ -83,64 +93,90 @@ const Disputes: React.FC = () => {
           </div>
         ) : (
           <div className="divide-y divide-primary-700/30">
-            {disputeQueue.map((sample) => (
-              <div
-                key={sample.id}
-                className="p-4 hover:bg-primary-800/20 transition-colors cursor-pointer"
-                onClick={() => navigate(`/supervisor/final/${sample.id}`)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-medium text-white">{sample.id}</span>
-                      <StatusBadge status={sample.status} />
-                      <PriorityBadge priority={sample.priority} />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                      <div>
-                        <span className="text-primary-500">视频时长：</span>
-                        <span className="text-primary-300">{framesToTime(sample.totalFrames, sample.fps)}</span>
+            {disputeQueue.map((sample) => {
+              const triggeredRejections = getTriggeredRejections(sample);
+              const similarity = sample.dispute?.similarity ?? 0;
+              const triggeredBySecond = sample.dispute?.triggeredBySecondRejection;
+              
+              return (
+                <div
+                  key={sample.id}
+                  className="p-4 hover:bg-primary-800/20 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/supervisor/final/${sample.id}`)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <span className="font-medium text-white">{sample.id}</span>
+                        <StatusBadge status={sample.status} />
+                        <PriorityBadge priority={sample.priority} />
+                        {triggeredBySecond !== undefined && (
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                            triggeredBySecond 
+                              ? 'bg-danger-900/40 text-danger-300 border border-danger-600/40' 
+                              : 'bg-warning-900/40 text-warning-300 border border-warning-600/40'
+                          }`}>
+                            {triggeredBySecond ? (
+                              <><Zap size={12} /> 二次驳回触发</>
+                            ) : (
+                              <><AlertCircle size={12} /> 复核驳回触发</>
+                            )}
+                          </span>
+                        )}
                       </div>
-                      <div>
-                        <span className="text-primary-500">区间数：</span>
-                        <span className="text-primary-300">{sample.intervals.length} 个</span>
-                      </div>
-                      <div>
-                        <span className="text-primary-500">驳回次数：</span>
-                        <span className="text-warning-400">{sample.rejections.length} 次</span>
-                      </div>
-                      <div>
-                        <span className="text-primary-500">相似度：</span>
-                        <span className="text-warning-400">
-                          {sample.dispute ? `${(sample.dispute.similarity * 100).toFixed(0)}%` : '-'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {sample.rejections.length >= 2 && (
-                      <div className="mt-3 p-3 bg-warning-900/20 rounded-lg">
-                        <div className="text-xs text-warning-400 mb-2">驳回原因对比</div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {sample.rejections.slice(0, 2).map((rejection) => (
-                            <div key={rejection.id} className="text-sm">
-                              <span className="text-primary-400">{rejection.userName}：</span>
-                              <span className="text-primary-300">{rejection.reason}</span>
-                            </div>
-                          ))}
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                        <div>
+                          <span className="text-primary-500">视频时长：</span>
+                          <span className="text-primary-300">{framesToTime(sample.totalFrames, sample.fps)}</span>
+                        </div>
+                        <div>
+                          <span className="text-primary-500">区间数：</span>
+                          <span className="text-primary-300">{sample.intervals.length} 个</span>
+                        </div>
+                        <div>
+                          <span className="text-primary-500">驳回次数：</span>
+                          <span className="text-warning-400">{sample.rejections.length} 次</span>
+                        </div>
+                        <div>
+                          <span className="text-primary-500">相似度：</span>
+                          <span className={`font-medium ${
+                            similarity > 0.7 ? 'text-danger-400' : 'text-warning-400'
+                          }`}>
+                            {similarity > 0 ? `${(similarity * 100).toFixed(0)}%` : '-'}
+                          </span>
                         </div>
                       </div>
-                    )}
 
-                    <div className="mt-2 text-xs text-primary-500">
-                      提交时间：{formatDate(sample.createdAt)}
+                      {triggeredRejections && (
+                        <div className="mt-3 p-3 bg-warning-900/20 rounded-lg border border-warning-800/40">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs text-warning-400 font-medium">触发争议的两条驳回原文</span>
+                            <span className="text-xs text-danger-400 font-mono">
+                              相似度 {similarity > 0 ? `${(similarity * 100).toFixed(0)}%` : '-'}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {triggeredRejections.map((rejection) => (
+                              <div key={rejection.id} className="text-sm">
+                                <span className="text-primary-400 font-medium">{rejection.userName}：</span>
+                                <span className="text-primary-200">"{rejection.reason}"</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-2 text-xs text-primary-500">
+                        提交时间：{formatDate(sample.createdAt)}
+                      </div>
                     </div>
+                    
+                    <ChevronRight className="text-primary-500 ml-4 flex-shrink-0" size={20} />
                   </div>
-                  
-                  <ChevronRight className="text-primary-500 ml-4 flex-shrink-0" size={20} />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

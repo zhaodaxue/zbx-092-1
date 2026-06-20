@@ -42,8 +42,8 @@ export const calculateSimilarity = (text1: string, text2: string): number => {
 };
 
 export const checkDisputeThreshold = (
-  rejections: Array<{ userId: string; reason: string }>
-): { shouldDispute: boolean; similarity: number } => {
+  rejections: Array<{ id: string; userId: string; reason: string }>
+): { shouldDispute: boolean; similarity: number; rejectionIds?: [string, string]; isSecondRejection?: boolean } => {
   const uniqueUsers = Array.from(new Set(rejections.map(r => r.userId)));
   if (uniqueUsers.length < 2) {
     return { shouldDispute: false, similarity: 0 };
@@ -62,9 +62,14 @@ export const checkDisputeThreshold = (
   const rej2 = userMap.get(secondUser)!.slice(-1)[0];
 
   const similarity = calculateSimilarity(rej1.reason, rej2.reason);
+  const isSecondRejection = 
+    userMap.get(firstUser)!.length === 1 && 
+    userMap.get(secondUser)!.length === 1;
 
   return {
     shouldDispute: similarity > 0.5,
     similarity: Math.round(similarity * 100) / 100,
+    rejectionIds: [rej1.id, rej2.id],
+    isSecondRejection,
   };
 };
