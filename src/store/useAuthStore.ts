@@ -5,8 +5,10 @@ import { loadFromStorage, saveToStorage } from '../utils/storage';
 
 interface AuthState {
   currentUser: User | null;
-  login: (role: UserRole) => void;
+  loginAsUser: (userId: string) => void;
+  loginByRole: (role: UserRole) => void;
   logout: () => void;
+  getUsersByRole: (role: UserRole) => User[];
 }
 
 const STORAGE_KEY = 'auth';
@@ -16,16 +18,30 @@ export const useAuthStore = create<AuthState>((set) => {
   
   return {
     currentUser: savedUser,
-    login: (role: UserRole) => {
-      const user = usersData.find(u => u.role === role) as User;
+    
+    loginAsUser: (userId: string) => {
+      const user = usersData.find(u => u.id === userId) as User | undefined;
       if (user) {
         set({ currentUser: user });
         saveToStorage(STORAGE_KEY, user);
       }
     },
+    
+    loginByRole: (role: UserRole) => {
+      const user = usersData.find(u => u.role === role) as User | undefined;
+      if (user) {
+        set({ currentUser: user });
+        saveToStorage(STORAGE_KEY, user);
+      }
+    },
+    
     logout: () => {
       set({ currentUser: null });
       saveToStorage(STORAGE_KEY, null);
+    },
+    
+    getUsersByRole: (role: UserRole) => {
+      return usersData.filter(u => u.role === role) as User[];
     },
   };
 });

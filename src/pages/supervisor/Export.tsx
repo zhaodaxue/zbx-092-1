@@ -1,32 +1,49 @@
 import React, { useState, useMemo } from 'react';
-import { Download, Calendar, FileJson, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
+import { Download, Calendar, FileJson, CheckCircle, XCircle, ChevronRight, Lock, XOctagon } from 'lucide-react';
 import { AppLayout } from '../../components/Layout/AppLayout';
 import { useSampleStore } from '../../store/useSampleStore';
 import { useCategoryStore } from '../../store/useCategoryStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { generateExportData, exportToJson, getExportFilename } from '../../services/exportService';
 import { formatDate } from '../../utils/time';
+import type { Sample } from '../../types';
+
+const isExportable = (s: Sample): boolean => {
+  if (s.status === 'approved') return true;
+  if (s.status === 'locked' && s.dispute?.finalDecision === 'approved') return true;
+  return false;
+};
+
+const getFinalDecisionLabel = (s: Sample): { text: string; color: string; icon: React.ReactNode } => {
+  if (s.status === 'approved') {
+    return { text: '审核通过', color: 'text-success-400', icon: <CheckCircle className="text-success-400" size={16} /> };
+  }
+  if (s.status === 'locked' && s.dispute?.finalDecision === 'approved') {
+    return { text: '终裁通过(锁定)', color: 'text-primary-400', icon: <Lock className="text-primary-400" size={16} /> };
+  }
+  if (s.status === 'locked' && s.dispute?.finalDecision === 'rejected') {
+    return { text: '终裁驳回(锁定)', color: 'text-danger-400', icon: <XOctagon className="text-danger-400" size={16} /> };
+  }
+  return { text: s.status, color: 'text-primary-400', icon: <XCircle className="text-danger-400" size={16} /> };
+};
 
 const Export: React.FC = () => {
   const { samples } = useSampleStore();
   const { categories } = useCategoryStore();
   const { currentUser } = useAuthStore();
   
-  const [selectedDate, setSelectedDate] = useState<string>(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const today = new Date().toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState<string>(today);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const approvedSamples = useMemo(() => {
-    return samples.filter(s => s.status === 'approved' || s.status === 'locked');
-  }, [samples]);
+  const approvedSamples = useMemo(() => samples.filter(isExportable), [samples]);
 
   const dateGroups = useMemo(() => {
-    const groups: Record<string, typeof approvedSamples> = {};
+    const groups: Record<string, Sample[]> = {};
     
     approvedSamples.forEach(sample => {
-      const date = sample.updatedAt ? sample.updatedAt.split('T')[0] : sample.createdAt.split('T')[0];
+      if (!sample.reviewedAt) return;
+      const date = sample.reviewedAt.split('T')[0];
       if (!groups[date]) {
         groups[date] = [];
       }
@@ -42,6 +59,11 @@ const Export: React.FC = () => {
     const group = dateGroups.find(g => g.date === selectedDate);
     return group?.samples || [];
   }, [dateGroups, selectedDate]);
+
+  const lockedRejectedCount = useMemo(
+    () => samples.filter(s => s.status === 'locked' && s.dispute?.finalDecision === 'rejected').length,
+    [samples]
+  );
 
   const handleExport = () => {
     if (selectedDateSamples.length === 0) {
@@ -66,18 +88,6 @@ const Export: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    if (status === 'approved') return <CheckCircle className="text-success-400" size={16} />;
-    if (status === 'locked') return <CheckCircle className="text-primary-400" size={16} />;
-    return <XCircle className="text-danger-400" size={16} />;
-  };
-
-  const getStatusText = (status: string) => {
-    if (status === 'approved') return '审核通过';
-    if (status === 'locked') return '终裁通过(锁定)';
-    return status;
-  };
-
   return (
     <AppLayout>
       {notification && (
@@ -91,7 +101,7 @@ const Export: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white mb-2">数据导出</h1>
         <p className="text-primary-400">
-          按日期导出已通过审核样本的修订后标注 JSON 文件
+          按审核通过日期导出已通过（含终裁通过）样本的修订后标注 JSON 文件
         </p>
       </div>
 
@@ -100,7 +110,7 @@ const Export: React.FC = () => {
           <div className="card p-6">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Calendar size={20} className="text-primary-400" />
-              选择日期
+              选择通过日期
             </h2>
             
             <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin">
@@ -108,6 +118,11 @@ const Export: React.FC = () => {
                 <div className="text-center py-8">
                   <FileJson className="mx-auto text-primary-600 mb-3" size={40} />
                   <p className="text-primary-400 text-sm">暂无已通过的样本</p>
+                  {lockedRejectedCount > 0 && (
+                    <p className="text-xs text-danger-400 mt-2">
+                      另有 {lockedRejectedCount} 个终裁驳回样本不可导出
+                    </p>
+                  )}
                 </div>
               ) : (
                 dateGroups.map(({ date, samples: dateSamples }) => (
@@ -164,6 +179,12 @@ const Export: React.FC = () => {
                   {approvedSamples.filter(s => s.status === 'locked').length}
                 </span>
               </div>
+              {lockedRejectedCount > 0 && (
+                <div className="flex items-center justify-between opacity-70">
+                  <span className="text-danger-400 line-through">终裁驳回(锁定)</span>
+                  <span className="text-danger-400 font-semibold">不可导出 · {lockedRejectedCount}</span>
+                </div>
+              )}
               <div className="border-t border-primary-700/50 pt-3 flex items-center justify-between">
                 <span className="text-white font-medium">总计可导出</span>
                 <span className="text-white font-bold text-lg">{approvedSamples.length}</span>
@@ -193,60 +214,63 @@ const Export: React.FC = () => {
               </div>
             ) : (
               <div className="divide-y divide-primary-700/30 max-h-[600px] overflow-y-auto scrollbar-thin">
-                {selectedDateSamples.map((sample) => (
-                  <div key={sample.id} className="p-4 hover:bg-primary-800/20 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="font-medium text-white">{sample.id}</span>
-                          <div className="flex items-center gap-1">
-                            {getStatusIcon(sample.status)}
-                            <span className="text-xs text-primary-400">{getStatusText(sample.status)}</span>
+                {selectedDateSamples.map((sample) => {
+                  const status = getFinalDecisionLabel(sample);
+                  return (
+                    <div key={sample.id} className="p-4 hover:bg-primary-800/20 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="font-medium text-white">{sample.id}</span>
+                            <div className="flex items-center gap-1">
+                              {status.icon}
+                              <span className={`text-xs ${status.color}`}>{status.text}</span>
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <span className="text-primary-500">审核员：</span>
-                            <span className="text-primary-300">{sample.reviewedBy || '-'}</span>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                              <span className="text-primary-500">审核员：</span>
+                              <span className="text-primary-300">{sample.reviewedBy || '-'}</span>
+                            </div>
+                            <div>
+                              <span className="text-primary-500">标注区间：</span>
+                              <span className="text-primary-300">{sample.intervals.length} 个</span>
+                            </div>
+                            <div>
+                              <span className="text-primary-500">总帧数：</span>
+                              <span className="text-primary-300">{sample.totalFrames}</span>
+                            </div>
+                            <div>
+                              <span className="text-primary-500">通过时间：</span>
+                              <span className="text-primary-300">
+                                {sample.reviewedAt ? formatDate(sample.reviewedAt) : '-'}
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-primary-500">标注区间：</span>
-                            <span className="text-primary-300">{sample.intervals.length} 个</span>
-                          </div>
-                          <div>
-                            <span className="text-primary-500">总帧数：</span>
-                            <span className="text-primary-300">{sample.totalFrames}</span>
-                          </div>
-                          <div>
-                            <span className="text-primary-500">更新时间：</span>
-                            <span className="text-primary-300">
-                              {sample.updatedAt ? formatDate(sample.updatedAt) : '-'}
-                            </span>
-                          </div>
-                        </div>
 
-                        <div className="mt-3">
-                          <div className="text-xs text-primary-500 mb-1">标注类别：</div>
-                          <div className="flex flex-wrap gap-1">
-                            {[...new Set(sample.intervals.map(a => a.categoryId))].map(catId => {
-                              const category = categories.find(c => c.id === catId);
-                              return category ? (
-                                <span
-                                  key={catId}
-                                  className="px-2 py-0.5 rounded text-xs"
-                                  style={{ backgroundColor: `${category.color}30`, color: category.color }}
-                                >
-                                  {category.name}
-                                </span>
-                              ) : null;
-                            })}
+                          <div className="mt-3">
+                            <div className="text-xs text-primary-500 mb-1">标注类别：</div>
+                            <div className="flex flex-wrap gap-1">
+                              {[...new Set(sample.intervals.map(a => a.categoryId))].map(catId => {
+                                const category = categories.find(c => c.id === catId);
+                                return category ? (
+                                  <span
+                                    key={catId}
+                                    className="px-2 py-0.5 rounded text-xs"
+                                    style={{ backgroundColor: `${category.color}30`, color: category.color }}
+                                  >
+                                    {category.name}
+                                  </span>
+                                ) : null;
+                              })}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

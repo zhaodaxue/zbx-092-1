@@ -107,7 +107,7 @@ const SampleDetail: React.FC = () => {
   };
 
   const isLocked = sample.status === 'locked';
-  const canEdit = !isLocked && sample.status === 'pending';
+  const canEdit = !isLocked && (sample.status === 'pending' || sample.status === 'rejected');
 
   return (
     <AppLayout>
@@ -169,6 +169,13 @@ const SampleDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {sample.status === 'rejected' && (
+        <div className="bg-danger-900/30 border border-danger-600/50 rounded-lg p-4 mb-6 flex items-center gap-3">
+          <Info className="text-danger-400" size={20} />
+          <span className="text-danger-300">该样本此前被驳回，请修正标注后重新提交审核</span>
+        </div>
+      )}
 
       {isLocked && (
         <div className="bg-warning-900/30 border border-warning-600/50 rounded-lg p-4 mb-6 flex items-center gap-3">

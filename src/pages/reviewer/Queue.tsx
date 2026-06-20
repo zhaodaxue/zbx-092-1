@@ -33,7 +33,7 @@ const ReviewerQueue: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">待审队列</h1>
-          <p className="text-primary-400">按优先级排序，争议样本优先，其次按等待时间排序</p>
+          <p className="text-primary-400">按优先级评分排序（优先级越高、等待时间越长越靠前），含待审核及驳回待重审样本</p>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">

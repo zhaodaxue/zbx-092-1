@@ -221,7 +221,7 @@
     "dispute": {
       "id": "dispute-001",
       "sampleId": "sample-005",
-      "similarity": 0.67
+      "similarity": 0.60
     },
     "intervals": [
       {
@@ -321,7 +321,7 @@
     "dispute": {
       "id": "dispute-002",
       "sampleId": "sample-007",
-      "similarity": 0.72,
+      "similarity": 0.58,
       "finalDecision": "approved",
       "decidedBy": "王主管",
       "decidedAt": "2026-06-19T16:00:00.000Z"
